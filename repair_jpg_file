@@ -1,0 +1,10 @@
+#!/bin/bash
+mkdir -p pictures_recovered_compressed
+echo What is the extension file ? ; read extension_file
+for number_file in {1..210}
+do
+	exiftool -b -ThumbnailImage -w %f_thumb.%e -ext JPG $number_file".$extension_file"
+	mv $number_file".$extension_file" pictures_recovered_compressed 
+done
+zip -r -9 pictures_recovered_compressed pictures_recovered_compressed ; rm -r pictures_recovered_compressed
+echo --------------------the file recovery is finished !--------------------
