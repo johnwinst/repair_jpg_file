@@ -1,10 +1,50 @@
 #!/bin/bash
-mkdir -p pictures_recovered_compressed
-echo What is the extension file ? ; read extension_file
-for number_file in {1..210}
-do
-	exiftool -b -ThumbnailImage -w %f_thumb.%e -ext JPG $number_file".$extension_file"
-	mv $number_file".$extension_file" pictures_recovered_compressed 
-done
-zip -r -9 pictures_recovered_compressed pictures_recovered_compressed ; rm -r pictures_recovered_compressed
-echo --------------------the file recovery is finished !--------------------
+request(){
+	echo What is the extension file ? ; read extension_file
+}
+
+count_picture(){
+	number_file=$(ls *.$extension_file | wc -l)
+}
+
+rename_picture(){
+	for NAME in $(ls); do
+			mv ${NAME} ${number_file%.*}.$extension_file
+	done
+}
+
+# les images compressées sont celles par défaut/ n'ont reçu aucune modification depuis leur récupération.
+duplicate_picture_to_folder(){
+	folder_to_compress="compressed_corrupted_picture"
+	mkdir -p $folder_to_compress
+	for (( i=0; i<$number_file; i++ )); do 
+		cp $number_file".$extension_file" $folder_to_compress
+	done
+}
+
+compress_folder(){
+	zip -r -9 $folder_to_compress $folder_to_compress ; rm -r $folder_to_compress
+}
+
+repair_corrupt_picture(){
+	for (( i=0; i<$number_file; i++ )); do 
+		exiftool -b -ThumbnailImage -w %f_thumb.%e -ext JPG $number_file".$extension_file" 
+	done
+}
+
+main(){
+request
+count_picture
+#rename_picture
+duplicate_picture_to_folder
+compress_folder
+repair_corrupt_picture
+}
+main
+
+
+#if [ "$(file $NAME|grep $extension_file)" ]; then
+			#for (( i=0; i<$number_file; i++ )); do
+				#mv ${NAME} ${number_file%.*}.$extension_file
+			#done
+		#fi
